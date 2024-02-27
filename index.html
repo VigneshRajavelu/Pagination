@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pagination</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+              .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .page-item {
+            margin: 0 5px;
+        }
+
+        .page-link {
+            text-decoration: none;
+            color: #007bff;
+            padding: 8px 16px;
+            display: inline-block;
+            border: 1px solid #007bff;
+            border-radius: 4px;
+        }
+
+        .page-link:hover {
+            background-color: #007bff;
+            color: #fff;
+        }
+
+        .active .page-link {
+            background-color:#007bff;
+            color: #fff;
+        }
+        .first, .previous{
+            margin-right: 10px;
+            margin-left: 10px;
+            padding: 8px 16px;
+            border: 1px solid #007bff;
+            border-radius: 4px;
+            text-decoration: none;
+            color: #007bff;
+
+        }
+    </style>
+</head>
+<body>
+    <script src="https://app.zenclass.in/sheets/v1/js/zen/suite/bundle.js"></script>
+    <h1 id="title">Pagination</h1>
+    <p id="description">Short explanation about the task.</p>
+    <div class="table-responsive" id="pagination">
+        <table class="table table-hover text-center table-striped table-bordered">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                </tr>
+            </thead>
+            <tbody id="table-body">
+            </tbody>
+        </table>
+    </div>
+    <div id="buttons" class="d-flex justify-content-center">
+        <div id="buttons" class="d-flex justify-content-center">
+            <button id="first" class="btn btn-primary">First</button>
+            <button id="previous" class="btn btn-primary">Previous</button>
+        </div>
+    </div>
+
+    <script>
+            const pagination = document.getElementById('pagination');
+        const totalPages = 10; // Replace with the total number of pages
+        const currentPage = 0; // Replace with the current page number
+        const itemsPerPage = 5; // Number of items to display per page
+        const tableBody = document.getElementById('table-body');
+
+        function createPagination(totalPages, currentPage) {
+            const ul = document.createElement('ul');
+            ul.className = 'pagination';
+
+            for (let i = 1; i <= totalPages; i++) {
+                const li = document.createElement('li');
+                li.className = 'page-item';
+
+                const a = document.createElement('a');
+                a.className = 'page-link';
+                a.href = '#';
+                a.textContent = i;
+
+                if (i === currentPage) {
+                    li.classList.add('active');
+                }
+
+                li.appendChild(a);
+                ul.appendChild(li);
+            }
+
+            return ul;
+        }
+
+        function loadData(pageNumber) {
+            fetch('https://raw.githubusercontent.com/Rajavasanthan/jsondata/master/pagenation.json')
+                .then(response => response.json())
+                .then(data => {
+                    const startIndex = (pageNumber - 1) * itemsPerPage;
+                    const endIndex = startIndex + itemsPerPage;
+                    const currentItems = data.slice(startIndex, endIndex);
+
+                    tableBody.innerHTML = '';
+
+                    currentItems.forEach(item => {
+                        const tr = document.createElement('tr');
+
+                        const td1 = document.createElement('td');
+                        td1.textContent = item.id;
+
+                        const td2 = document.createElement('td');
+                        td2.textContent = item.name;
+
+                        const td3 = document.createElement('td');
+                        td3.textContent = item.email;
+
+                        tr.appendChild(td1);
+                        tr.appendChild(td2);
+                        tr.appendChild(td3);
+
+                        tableBody.appendChild(tr);
+                    });
+                });
+        }
+        function goToFirstPage() {
+            if (currentPage !== 1) {
+                currentPage = 1;
+                loadData(currentPage);
+            }
+        }
+
+        function goToPreviousPage() {
+            if (currentPage > 1) {
+                currentPage--;
+                loadData(currentPage);
+            }
+        }
+        pagination.appendChild(createPagination(totalPages, currentPage));
+
+        // Add event listeners to handle clicks on the pagination links
+        document.querySelectorAll('.page-link').forEach(link => {
+            link.addEventListener('click', event => {
+                event.preventDefault();
+                const pageNumber = parseInt(link.textContent);
+                loadData(pageNumber);
+            });
+        });
+        firstBtn.addEventListener('click', goToFirstPage);
+        previousBtn.addEventListener('click', goToPreviousPage);
+        loadData(currentPage);
+    </script>
+</body>
+</html>
